@@ -16,8 +16,18 @@ function unpack(rows, key) {
 }
 
 function render(category, year) {
+  console.log(year)
   d3.csv('/assets/data.csv', function (err, rows) {
-    const filteredRowsByYear = rows.filter(function (row) { return row.Year * 1 === year });
+    var years = [...new Set(unpack(rows, 'Year'))].map(function (item) {
+      return item * 1
+    }).sort();
+
+    $('#year').attr('min', years[0]);
+    $('#year').val(year);
+    $('#year-container p').text(year);
+    $('#year').attr('max', years[years.length - 1]);
+
+    const filteredRowsByYear = rows.filter(function (row) { return row.Year * 1 === year * 1 });
     var coordinates = {};
     var countryArray = unpack(rows, 'Entity');
     var countries = [...new Set(countryArray)];
@@ -49,7 +59,7 @@ function render(category, year) {
         if (coordinates[country]) {
           lats.push(coordinates[country].lat);
           lons.push(coordinates[country].lng);
-          labels.push(row.Entity + ',' + row[category] === "" ? 0 : row[category])
+          labels.push(row.Entity + ': ' + (row[category] === "" ? 0 : row[category]))
         }
       });
 
@@ -59,6 +69,7 @@ function render(category, year) {
         text: labels,
         lat: lats,
         lon: lons,
+        hoverinfo: "text",
         marker: {
           color: unpack(rows, 'Aquaculture production (metric tons)'),
           colorscale: scls[category],
@@ -125,9 +136,13 @@ function render(category, year) {
 }
 
 $(document).ready(function () {
-  render('Capture fisheries production (metric tons)', 1976);
+  render('Capture fisheries production (metric tons)', 1960);
 
   $('#category').change(function (e) {
-    render(e.target.value, 1976);
+    render(e.target.value, $('#year').val() * 1);
+  });
+
+  $('#year').change(function (e) {
+    render($('#category').val(), e.target.value * 1);
   })
 });

@@ -1,0 +1,118 @@
+body {
+  margin: 0;
+}
+
+body * {
+  font-family: 'Inter', sans-serif !important;
+}
+
+#header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  font-weight: 700;
+  font-size: 24px;
+  z-index: 10;
+}
+
+#map {
+  height: calc(100vh - 80px);
+  box-sizing: border-box;
+}
+
+#category {
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  background: #191A1A;
+  appearance: none;
+  height: 40;
+  border-radius: 5px;
+  z-index: 10;
+  color: #FFF;
+  padding: 0 12px;
+}
+
+#year-container {
+  width: 100%;
+  max-width: 360px;
+  position: fixed;
+  bottom: 30px;
+  right: 250px;
+}
+
+#year-container p {
+  font-size: 24px;
+  text-align: center;
+  margin: 0;
+  color: #FFF;
+}
+
+:root {
+  --primary-color: #657bdb;
+  --primary-color--translucent: rgba(85, 106, 195, 0.3);
+  --secondary-color: #d93d59;
+  --background-color: #060913;
+  --background-color-secondary: #0f1424;
+  --text-color: #e4e4e7;
+  --text-color--muted: #838690;
+  --line-color: #303341;
+}
+
+/* The crazy stuff that needs to be here for the custom input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  margin: 18px 0;
+  width: 100%;
+  transition: all 0.265ms ease-out;
+}
+
+input[type="range"]:not(:last-of-type) {
+  margin-top: 0;
+  margin-bottom: 2.5em;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: var(--line-color);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0 0 8px 1px var(--secondary-color),
+    0 0 16px 4px var(--background-color);
+  border: 3px solid #fff;
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  background: var(--secondary-color);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -8px;
+}
+
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background: var(--line-color);
+}
+
+input[type=range]::-moz-range-thumb {
+  box-shadow: 0 0 8px 1px var(--secondary-color),
+    0 0 16px 4px var(--background-color);
+  border: 3px solid #fff;
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  background: var(--secondary-color);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -8px;
+}
