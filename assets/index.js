@@ -1,30 +1,133 @@
-var data = [{
-  type:'scattermapbox',
-  lat:['45.5017'],
-  lon:['-73.5673'],
-  mode:'markers',
-  marker: {
-    size:14
-  },
-  text:['Montreal']
-}]
+mapboxgl.accessToken = 'pk.eyJ1IjoicGluazExMTFtYXBzIiwiYSI6ImNsaWQ0cmtndjBsZzIzZm4yN2U2NXYwYnoifQ.9PB39FfjdT-FE9TZWbkNMA';
+var mapboxClient = mapboxSdk({ accessToken: mapboxgl.accessToken });
 
-var layout = {
-  autosize: true,
-  hovermode:'closest',
-  mapbox: {
-    bearing:0,
-    center: {
-      lat:45,
-      lon:-73
-    },
-    pitch:0,
-    zoom:5
-  },
+const categories = {
+  "Capture fisheries production (metric tons)": "Wild Capture production",
+  "Aquaculture production (metric tons)": "Aquaculture production",
+};
+
+var scls = {
+  "Capture fisheries production (metric tons)": [[0, 'rgb(255, 0, 0)'], [1, 'rgb(255, 255, 0)']],
+  "Aquaculture production (metric tons)": [[0, 'rgb(0, 255, 0)'], [1, 'rgb(255, 255, 0)']],
 }
 
-Plotly.setPlotConfig({
-  mapboxAccessToken: "pk.eyJ1IjoicGluazExMTFtYXBzIiwiYSI6ImNsaWQ0cmtndjBsZzIzZm4yN2U2NXYwYnoifQ.9PB39FfjdT-FE9TZWbkNMA"
-})
+function unpack(rows, key) {
+  return rows.map(function (row) { return row[key]; });
+}
 
-Plotly.newPlot('myDiv', data, layout)
+function render(category, year) {
+  d3.csv('/assets/data.csv', function (err, rows) {
+    const filteredRowsByYear = rows.filter(function (row) { return row.Year * 1 === year });
+    var coordinates = {};
+    var countryArray = unpack(rows, 'Entity');
+    var countries = [...new Set(countryArray)];
+
+    countries.map(function (country) {
+      mapboxClient.geocoding.forwardGeocode({
+        query: country,
+        types: ['country'],
+        limit: 1
+      })
+        .send()
+        .then(function (response) {
+          if (response && response.body && response.body.features && response.body.features.length) {
+            var feature = response.body.features[0];
+            coordinates[country] = {
+              lat: feature.center[1],
+              lng: feature.center[0],
+            }
+          }
+        });
+    })
+
+    setTimeout(function () {
+      var lats = [];
+      var lons = [];
+      var labels = [];
+      filteredRowsByYear.map(function (row) {
+        var country = row.Entity;
+        if (coordinates[country]) {
+          lats.push(coordinates[country].lat);
+          lons.push(coordinates[country].lng);
+          labels.push(row.Entity + ',' + row[category] === "" ? 0 : row[category])
+        }
+      });
+
+      var data = [{
+        type: 'scattermapbox',
+        name: categories[category],
+        text: labels,
+        lat: lats,
+        lon: lons,
+        marker: {
+          color: unpack(rows, 'Aquaculture production (metric tons)'),
+          colorscale: scls[category],
+          cmin: 0,
+          cmax: 1.4,
+          reversescale: true,
+          opacity: 0.5,
+          size: 10,
+          colorbar: {
+            thickness: 20,
+            titleside: 'bottom',
+            outlinecolor: 'rgba(68,68,68)',
+            ticklen: 5,
+            shoticksuffix: 'last',
+            dtick: 1
+          }
+        },
+      }];
+
+      var layout = {
+        font: {
+          color: 'white'
+        },
+        dragmode: 'zoom',
+        mapbox: {
+          center: {
+            lat: 38.03697222,
+            lon: -90.70916722
+          },
+          domain: {
+            x: [0, 1],
+            y: [0, 1]
+          },
+          style: 'dark',
+          zoom: 2
+        },
+        margin: {
+          r: 0,
+          t: 0,
+          b: 0,
+          l: 0,
+          pad: 0
+        },
+        paper_bgcolor: '#191A1A',
+        plot_bgcolor: '#191A1A',
+        showlegend: true,
+        annotations: [{
+          x: 0,
+          y: 0,
+          xref: 'paper',
+          yref: 'paper',
+          text: 'Source: <a href="https://data.nasa.gov/Space-Science/Meteorite-Landings/gh4g-9sfh" style="color: rgb(255,255,255)">NASA</a>',
+          showarrow: false
+        }]
+      };
+
+      Plotly.setPlotConfig({
+        mapboxAccessToken: "pk.eyJ1IjoicGluazExMTFtYXBzIiwiYSI6ImNsaWQ0cmtndjBsZzIzZm4yN2U2NXYwYnoifQ.9PB39FfjdT-FE9TZWbkNMA"
+      });
+
+      Plotly.newPlot('map', [data[0]], layout);
+    }, 1000);
+  });
+}
+
+$(document).ready(function () {
+  render('Capture fisheries production (metric tons)', 1976);
+
+  $('#category').change(function (e) {
+    render(e.target.value, 1976);
+  })
+});

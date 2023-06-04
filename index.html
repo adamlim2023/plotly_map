@@ -1,8 +1,59 @@
+<html lang="en">
+
 <head>
-  <!-- Load plotly.js into the DOM -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src='https://cdn.plot.ly/plotly-2.20.0.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+  <script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+    }
+
+    body * {
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    #map {
+      height: 100vh;
+    }
+
+    #category {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #191A1A;
+      appearance: none;
+      height: 40;
+      border-radius: 5px;
+      z-index: 10;
+      color: #FFF;
+      padding: 0 12px;
+    }
+  </style>
 </head>
 
 <body>
-  <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
+  <select id="category">
+    <option value="Capture fisheries production (metric tons)">
+      Wild Capture production
+    </option>
+    <option value="Aquaculture production (metric tons)">
+      Aquaculture production
+    </option>
+  </select>
+  <div id='map'></div>
+  <script src="./assets/index.js"></script>
+  <!-- <script src="./assets/index_.js"></script> -->
 </body>
+
+</html>
